@@ -1,0 +1,12 @@
+{
+  "triggerSource": "UserMigration_Authentication",
+  "userName": "test",
+  "request": {
+    "password": "test"
+  },
+  "response": {
+    "userAttributes": {},
+    "finalUserStatus": "Nope",
+    "messageAction": "Nope"
+  }
+}

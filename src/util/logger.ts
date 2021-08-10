@@ -7,6 +7,10 @@ export class Logger {
     this.logFormat = `{ "apiRequestId": "${apiRequestId}", "correlationId": "${correlationId}", "message": "%s" }`;
   }
 
+  public trace(msg: string, ...args): void {
+    console.trace(this.logFormat, msg, JSON.stringify(args));
+  }
+
   public debug(msg: string): void {
     console.debug(this.logFormat, msg);
   }

@@ -106,3 +106,8 @@ dist
 
 # MAC files
 .DS_Store
+
+.aws-sam/
+.idea/
+aws-toolkit-ts-output/
+/aws-toolkit-tsconfig.json

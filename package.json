@@ -22,7 +22,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.943.0"
+    "aws-sdk": "^2.943.0",
+    "ldap-authentication": "^2.2.7"
   },
   "devDependencies": {
     "@dvsa/eslint-config-ts": "^2.0.1",
