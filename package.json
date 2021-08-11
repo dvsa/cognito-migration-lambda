@@ -1,7 +1,7 @@
 {
-  "name": "dvsa-lambda-starter",
+  "name": "cognito-user-migration",
   "version": "1.0.0",
-  "description": "A package to act as a starter for typescript lambdas",
+  "description": "A lambda function responsible for handling user migration trigger events from AWS Cognito",
   "main": "index.js",
   "scripts": {
     "lint": "eslint '*/**/*.ts' --quiet --fix",
@@ -11,10 +11,13 @@
     "build:dev": "NODE_ENV=development webpack-cli --config webpack/webpack.development.js",
     "watch:dev": "NODE_ENV=development webpack-cli --config webpack/webpack.development.watch.js",
     "build:prod": "webpack-cli --config webpack/webpack.production.js",
-    "start:dev": "sam local start-api",
     "invoke": "sam local invoke"
   },
   "contributors": [
+    {
+      "name": "James Wragg",
+      "email": "james.wragg@dvsa.gov.uk"
+    },
     {
       "name": "Shaun Hare",
       "email": "shaun.hare@dvsa.gov.uk"
@@ -22,9 +25,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.943.0",
-    "ldap-authentication": "^2.2.7",
-    "ldapjs": "^2.3.1"
+    "aws-lambda": "^1.0.6",
+    "ldapts": "^3.0.5"
   },
   "devDependencies": {
     "@dvsa/eslint-config-ts": "^2.0.1",

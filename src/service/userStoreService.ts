@@ -1,7 +1,5 @@
-import { authenticate, LdapAuthenticationError } from 'ldap-authentication';
-import { InvalidCredentialsError } from 'ldapjs/lib/errors';
+import { Client, Entry } from 'ldapts';
 import { Logger } from '../util/logger';
-import { User } from '../type/user';
 import { AuthenticationResult } from '../type/authenticationResult';
 
 export class UserStoreService {
@@ -11,39 +9,32 @@ export class UserStoreService {
     this.logger = logger;
   }
 
-  public authenticate(userName: string, password: string): AuthenticationResult {
-    const options = {
-      ldapOpts: {
-        url: process.env.LDAP_URL,
-        log: this.logger,
-      },
-      adminDn: process.env.LDAP_ADMIN_DN,
-      adminPassword: process.env.LDAP_ADMIN_PASSWORD,
-      userSearchBase: process.env.LDAP_USER_SEARCH_BASE,
-      usernameAttribute: process.env.LDAP_USERNAME_ATTRIBUTE,
-      username: userName,
-      userPassword: password,
-    };
+  public async authenticate(userName: string, password: string): Promise<AuthenticationResult> {
+    const client = new Client({
+      url: process.env.LDAP_URL,
+    });
 
-    this.logger.debug(`Attempting LDAP authentication with options: ${JSON.stringify(options)}`);
+    const bindDn = `${process.env.LDAP_USERNAME_ATTRIBUTE}=${userName},${process.env.LDAP_USER_SEARCH_BASE}`;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
-      const user: User = authenticate(options);
+      await client.bind(bindDn, password);
+      const { searchEntries } = await client.search(bindDn);
+      this.logger.debug(JSON.stringify(searchEntries));
+      const entry: Entry = searchEntries.pop();
+
       return {
         success: true,
         message: 'Authentication Success',
-        user,
+        entry,
       } as AuthenticationResult;
     } catch (e) {
-      this.logger.debug(`Exception raised when attempting LDAP authentication: ${JSON.stringify(e)}`);
-      if (e instanceof InvalidCredentialsError || e instanceof LdapAuthenticationError) {
-        return {
-          success: false,
-          message: 'Invalid Credentials',
-        } as AuthenticationResult;
-      }
-      throw (e);
+      this.logger.error(e);
+      return {
+        success: false,
+        message: 'Invalid Credentials',
+      } as AuthenticationResult;
+    } finally {
+      await client.unbind();
     }
   }
 }

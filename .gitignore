@@ -111,3 +111,4 @@ dist
 .idea/
 aws-toolkit-ts-output/
 /aws-toolkit-tsconfig.json
+/env.json

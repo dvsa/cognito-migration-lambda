@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  CognitoUserMigrationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/handler/cognitoUserMigrationEvent.lambdaHandler
+      Runtime: nodejs14.x
+
+Outputs:
+  CognitoUserMigrationFunction:
+    Description: "Cognito User Migration Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for Cognito User Migration function"
+    Value: !GetAtt CognitoUserMigrationFunctionRole.Arn
