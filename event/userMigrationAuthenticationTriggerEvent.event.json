@@ -1,6 +1,6 @@
 {
   "triggerSource": "UserMigration_Authentication",
-  "userName": "test1",
+  "userName": "test",
   "request": {
     "password": "test"
   },

@@ -3,7 +3,7 @@ import { InvalidCredentialsError, NoSuchObjectError } from 'ldapts/errors/result
 import { Logger } from '../util/logger';
 import { UserNotFoundException, InvalidCredentialsException, LdapException } from '../exception';
 
-export class UserStoreService {
+export class LdapUserStoreService {
   private readonly logger: Logger;
 
   constructor(logger: Logger) {
