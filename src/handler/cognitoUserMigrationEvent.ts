@@ -2,33 +2,38 @@ import type {
   UserMigrationTriggerEvent,
   Context, UserMigrationAuthenticationTriggerEvent, UserMigrationForgotPasswordTriggerEvent,
 } from 'aws-lambda';
+import { Entry } from 'ldapts';
 import { createLogger, Logger } from '../util/logger';
 import { UserStoreService } from '../service/userStoreService';
+
+function generateMigrationEventResponse(user: Entry, event: UserMigrationTriggerEvent): UserMigrationTriggerEvent {
+  // TODO: Extract into ENV variable, and JSON.parse it.
+  const map: Record<string, string> = {
+    mail: 'email',
+    cn: 'username',
+  };
+  const attributes: Record<string, string> = {};
+  for (let i = 0; i < Object.keys(user).length; i++) {
+    const key: string = Object.keys(user)[i];
+    if (key in map) {
+      attributes[map[key]] = user[key].toString();
+    }
+  }
+  attributes.email_verified = 'true';
+  event.response.userAttributes = attributes;
+  event.response.finalUserStatus = 'CONFIRMED';
+  event.response.messageAction = 'SUPPRESS';
+
+  return event;
+}
 
 async function migrateUserAuthentication(
   event: UserMigrationAuthenticationTriggerEvent,
   logger: Logger,
 ): Promise<UserMigrationAuthenticationTriggerEvent> {
   const userStoreService = new UserStoreService(logger);
-  const authenticationResult = await userStoreService.authenticate(event.userName, event.request.password);
-
-  if (authenticationResult.success === false) {
-    throw new Error('Invalid Credentials');
-  }
-
-  const { user } = authenticationResult;
-
-  // TODO: Make configurable.
-  const map = {
-    email: user.mail,
-    email_verified: 'true',
-  };
-
-  event.response.userAttributes = map;
-  event.response.finalUserStatus = 'CONFIRMED';
-  event.response.messageAction = 'SUPPRESS';
-
-  return event;
+  const user = await userStoreService.authenticate(event.userName, event.request.password);
+  return generateMigrationEventResponse(user, event) as UserMigrationAuthenticationTriggerEvent;
 }
 
 async function migrateUserForgotPassword(
@@ -36,11 +41,8 @@ async function migrateUserForgotPassword(
   logger: Logger,
 ): Promise<UserMigrationForgotPasswordTriggerEvent> {
   const userStoreService = new UserStoreService(logger);
-  const authenticationResult = await userStoreService.authenticate(event.userName, event.request.password);
-
-  throw new Error('Not Implemented');
-
-  return event;
+  const user = await userStoreService.getUser(event.userName);
+  return generateMigrationEventResponse(user, event) as UserMigrationForgotPasswordTriggerEvent;
 }
 
 /**

@@ -8,6 +8,13 @@ Resources:
       CodeUri: .
       Handler: src/handler/cognitoUserMigrationEvent.lambdaHandler
       Runtime: nodejs14.x
+      Environment:
+        Variables:
+          LDAP_URL: ''
+          LDAP_ADMIN_DN: ''
+          LDAP_ADMIN_PASSWORD: ''
+          LDAP_USER_SEARCH_BASE: ''
+          LDAP_USERNAME_ATTRIBUTE: ''
 
 Outputs:
   CognitoUserMigrationFunction:
