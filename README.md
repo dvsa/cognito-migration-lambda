@@ -2,7 +2,7 @@
 
 A Lambda to be invoked by AWS Cognito, to migrate users from an LDAP source.
 
-Can handle both `` and `` events from AWS Cognito.
+Can handle both `UserMigration_Authentication` and `UserMigration_ForgotPassword` events from AWS Cognito as referenced in https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-migrate-user.html
 
 ##Configuration
 
