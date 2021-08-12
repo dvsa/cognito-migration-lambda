@@ -7,16 +7,12 @@ import { createLogger, Logger } from '../util/logger';
 import { LdapUserStoreService } from '../service/ldapUserStoreService';
 
 function generateMigrationEventResponse(user: Entry, event: UserMigrationTriggerEvent): UserMigrationTriggerEvent {
-  // TODO: Extract into ENV variable, and JSON.parse it.
-  const map: Record<string, string> = {
-    mail: 'email',
-    cn: 'username',
-  };
+  const map: Record<string, string> = JSON.parse(process.env.LDAP_OBJECT_FILTER_MAP) as Record<string, string>;
   const attributes: Record<string, string> = {};
   for (let i = 0; i < Object.keys(user).length; i++) {
-    const key: string = Object.keys(user)[i];
+    const key: string = Object.keys(user)[Number(i)];
     if (key in map) {
-      attributes[map[key]] = user[key].toString();
+      attributes[map[key.toString()]] = user[key.toString()].toString();
     }
   }
   attributes.email_verified = 'true';
