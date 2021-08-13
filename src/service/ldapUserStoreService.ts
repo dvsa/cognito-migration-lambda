@@ -18,11 +18,13 @@ export class LdapUserStoreService {
     const searchDn = `${process.env.LDAP_USERNAME_ATTRIBUTE}=${userName},${process.env.LDAP_USER_SEARCH_BASE}`;
 
     try {
+      this.logger.trace(`Attempting to BIND on ${process.env.LDAP_URL} with ${process.env.LDAP_ADMIN_DN}`);
       await client.bind(process.env.LDAP_ADMIN_DN, process.env.LDAP_ADMIN_PASSWORD);
+      this.logger.trace(`Attempting to SEARCH on ${process.env.LDAP_URL} with ${searchDn}`);
       const { searchEntries } = await client.search(searchDn);
-      this.logger.debug(JSON.stringify(searchEntries));
+      this.logger.trace(`Search Entries: ${JSON.stringify(searchEntries)}`);
       const entry: Entry = searchEntries.pop();
-      this.logger.debug(JSON.stringify(entry));
+      this.logger.trace(`Using Entry: ${JSON.stringify(entry)}`);
       return entry;
     } catch (e) {
       if (e instanceof NoSuchObjectError) {
@@ -32,12 +34,12 @@ export class LdapUserStoreService {
       this.logger.error(JSON.stringify(error));
       throw new LdapException(error.message);
     } finally {
+      this.logger.trace(`Attempting to UNBIND on ${process.env.LDAP_URL} with ${process.env.LDAP_ADMIN_DN}`);
       await client.unbind();
     }
   }
 
   public async authenticate(userName: string, password: string): Promise<Entry> {
-    this.logger.trace(`Connecting to LDAP on ${process.env.LDAP_URL}`);
     const client = new Client({
       url: process.env.LDAP_URL,
     });
@@ -46,6 +48,7 @@ export class LdapUserStoreService {
 
     try {
       const user: Entry = await this.getUser(userName);
+      this.logger.trace(`Attempting to BIND on ${process.env.LDAP_URL} with ${bindDn}`);
       await client.bind(bindDn, password);
       return user;
     } catch (e) {
@@ -59,6 +62,7 @@ export class LdapUserStoreService {
       this.logger.error(JSON.stringify(error));
       throw new LdapException(error.message);
     } finally {
+      this.logger.trace(`Attempting to UNBIND on ${process.env.LDAP_URL} with ${bindDn}`);
       await client.unbind();
     }
   }
