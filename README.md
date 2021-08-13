@@ -14,7 +14,7 @@ A valid LDAP URL (proto/host/port only).
 
 #### Example
 ```text
-ldap://example.net::389
+ldap://example.net:389
 ```
 
 ### LDAP_ADMIN_DN
@@ -88,13 +88,13 @@ To watch for changes and automatically trigger a new build:
 
 ## Run Lambdas Locally
 
+- Ensure you have an LDAP instance running (`docker-compose up`)
 - Build the files first
-- `npm run start:dev`
-- To ensure that the lambdas have been successfully served, run the following command in a separate terminal:
-    - `curl --request GET http://localhost:3000/?message=hello%20world`
-    - the response should be: `{"queryParams": {"message": "hello world"}}`
-- To run CloudWatch Event lambdas: `npm run invoke -- CloudWatchEventLambdaFunction`
-
+- Set environment variables in `env.json` (see `env.example.json` for an example)
+- To run CloudWatch Event lambdas:
+  ```
+  npm run invoke -- --env-vars env.json -e ./event/userMigrationAuthenticationTriggerEvent.event.json
+  ```
 
 ## Tests
 

@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+  openldap:
+    hostname: openldap.local
+    image: osixia/openldap:latest
+    environment:
+      LDAP_LOG_LEVEL: "512"
+      LDAP_ORGANISATION: "DVSA"
+      LDAP_DOMAIN: "localdev.dvsa"
+      LDAP_TLS_VERIFY_CLIENT: "allow"
+    ports:
+      - "389:389"
+    command: "--copy-service --loglevel warning"
+    networks:
+      localdev:
+        aliases:
+          - 'openldap.local'
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap.local"
+      PHPLDAPADMIN_HTTPS: "false"
+    ports:
+      - "8389:80"
+    depends_on:
+      - openldap
+    networks:
+      - localdev
+
+networks:
+  localdev:
+    driver: bridge
