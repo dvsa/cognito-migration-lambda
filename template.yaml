@@ -20,7 +20,7 @@ Resources:
 Outputs:
   CognitoUserMigrationFunction:
     Description: "Cognito User Migration Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
+    Value: !GetAtt CognitoUserMigrationFunction.Arn
+  CognitoUserMigrationFunctionIamRole:
     Description: "Implicit IAM Role created for Cognito User Migration function"
     Value: !GetAtt CognitoUserMigrationFunctionRole.Arn
