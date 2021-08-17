@@ -3,7 +3,7 @@ import { Client, Entry } from 'ldapts';
 import { InvalidCredentialsError, NoSuchObjectError } from 'ldapts/errors/resultCodeErrors';
 import { LdapUserStoreService } from '../../src/service/ldapUserStoreService';
 import { Logger } from '../../src/util/logger';
-import { InvalidCredentialsException, LdapException, UserNotFoundException} from '../../src/exception';
+import { InvalidCredentialsException, LdapException, UserNotFoundException } from '../../src/exception';
 
 jest.mock('../../src/util/logger', () => ({
   Logger: jest.fn().mockImplementation(() => ({

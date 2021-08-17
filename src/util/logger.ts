@@ -1,4 +1,4 @@
-import type { Context, UserMigrationTriggerEvent } from 'aws-lambda';
+import type { Context } from 'aws-lambda';
 
 export class Logger {
   logFormat: string;
