@@ -52,7 +52,7 @@ export class LdapUserStoreService {
       await client.bind(bindDn, password);
       return user;
     } catch (e) {
-      if (e instanceof UserNotFoundException || LdapException) {
+      if (e instanceof UserNotFoundException || e instanceof LdapException) {
         throw e;
       }
       if (e instanceof InvalidCredentialsError) {

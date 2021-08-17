@@ -52,7 +52,7 @@ export const lambdaHandler = async (
   event: UserMigrationTriggerEvent,
   context: Context,
 ): Promise<UserMigrationTriggerEvent> => {
-  const logger: Logger = createLogger(null, context);
+  const logger: Logger = createLogger(context);
 
   switch (event.triggerSource) {
     case 'UserMigration_Authentication':
