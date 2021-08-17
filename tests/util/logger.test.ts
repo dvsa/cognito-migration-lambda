@@ -1,4 +1,4 @@
-import type { APIGatewayProxyEvent, Context, APIGatewayEventRequestContext } from 'aws-lambda';
+import type { Context } from 'aws-lambda';
 import { v4 } from 'uuid';
 import { createLogger, Logger } from '../../src/util/logger';
 
