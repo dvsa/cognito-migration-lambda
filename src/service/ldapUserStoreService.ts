@@ -11,9 +11,7 @@ export class LdapUserStoreService {
   }
 
   public async getUser(userName: string): Promise<Entry | null> {
-    const client = new Client({
-      url: process.env.LDAP_URL,
-    });
+    const client = this.createClient();
 
     const searchDn = `${process.env.LDAP_USERNAME_ATTRIBUTE}=${userName},${process.env.LDAP_USER_SEARCH_BASE}`;
 
@@ -40,9 +38,7 @@ export class LdapUserStoreService {
   }
 
   public async authenticate(userName: string, password: string): Promise<Entry> {
-    const client = new Client({
-      url: process.env.LDAP_URL,
-    });
+    const client = this.createClient();
 
     const bindDn = `${process.env.LDAP_USERNAME_ATTRIBUTE}=${userName},${process.env.LDAP_USER_SEARCH_BASE}`;
 
@@ -65,5 +61,12 @@ export class LdapUserStoreService {
       this.logger.trace(`Attempting to UNBIND on ${process.env.LDAP_URL} with ${bindDn}`);
       await client.unbind();
     }
+  }
+
+  protected createClient(): Client {
+    return new Client({
+      url: process.env.LDAP_URL,
+      timeout: Number(process.env.LDAP_OPERATION_TIMEOUT) || 5000,
+    });
   }
 }

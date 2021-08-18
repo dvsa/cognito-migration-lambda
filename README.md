@@ -17,6 +17,15 @@ A valid LDAP URL (proto/host/port only).
 ldap://example.net:389
 ```
 
+### LDAP_OPERATION_TIMEOUT
+
+Timeout for LDAP operations in milliseconds (default: 5000)
+
+#### Example
+```text
+10000
+```
+
 ### LDAP_ADMIN_DN
 
 The FQDN for the admin user to search and obtain user objects.

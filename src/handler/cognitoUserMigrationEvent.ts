@@ -6,7 +6,10 @@ import { Entry } from 'ldapts';
 import { createLogger, Logger } from '../util/logger';
 import { LdapUserStoreService } from '../service/ldapUserStoreService';
 
-function generateMigrationEventResponse(user: Entry, event: UserMigrationTriggerEvent): UserMigrationTriggerEvent {
+export const generateMigrationEventResponse = (
+  user: Entry,
+  event: UserMigrationTriggerEvent,
+): UserMigrationTriggerEvent => {
   const map: Record<string, string> = JSON.parse(process.env.LDAP_OBJECT_FILTER_MAP) as Record<string, string>;
   const attributes: Record<string, string> = {};
   for (let i = 0; i < Object.keys(user).length; i++) {
@@ -21,25 +24,25 @@ function generateMigrationEventResponse(user: Entry, event: UserMigrationTrigger
   event.response.messageAction = 'SUPPRESS';
 
   return event;
-}
+};
 
-async function migrateUserAuthentication(
+export const migrateUserAuthentication = async (
   event: UserMigrationAuthenticationTriggerEvent,
   logger: Logger,
-): Promise<UserMigrationAuthenticationTriggerEvent> {
+): Promise<UserMigrationAuthenticationTriggerEvent> => {
   const userStoreService = new LdapUserStoreService(logger);
   const user = await userStoreService.authenticate(event.userName, event.request.password);
   return generateMigrationEventResponse(user, event) as UserMigrationAuthenticationTriggerEvent;
-}
+};
 
-async function migrateUserForgotPassword(
+export const migrateUserForgotPassword = async (
   event: UserMigrationForgotPasswordTriggerEvent,
   logger: Logger,
-): Promise<UserMigrationForgotPasswordTriggerEvent> {
+): Promise<UserMigrationForgotPasswordTriggerEvent> => {
   const userStoreService = new LdapUserStoreService(logger);
   const user = await userStoreService.getUser(event.userName);
   return generateMigrationEventResponse(user, event) as UserMigrationForgotPasswordTriggerEvent;
-}
+};
 
 /**
  * Lambda Handler
