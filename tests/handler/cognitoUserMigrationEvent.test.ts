@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import type {
   Context,
   UserMigrationAuthenticationTriggerEvent,
-  UserMigrationForgotPasswordTriggerEvent, UserMigrationTriggerEvent
+  UserMigrationForgotPasswordTriggerEvent, UserMigrationTriggerEvent,
 } from 'aws-lambda';
 import * as handler from '../../src/handler/cognitoUserMigrationEvent';
 
@@ -25,7 +25,7 @@ describe('Test cognitoUserMigrationEventHandler', () => {
         () => Promise.resolve(<UserMigrationAuthenticationTriggerEvent> {}),
       );
 
-      const result = await handler.lambdaHandler(eventMock, contextMock);
+      await handler.lambdaHandler(eventMock, contextMock);
       expect(spy).toHaveBeenCalled();
     });
     test('Event trigger UserMigration_ForgotPassword', async () => {
@@ -37,7 +37,7 @@ describe('Test cognitoUserMigrationEventHandler', () => {
         () => Promise.resolve(<UserMigrationForgotPasswordTriggerEvent> {}),
       );
 
-      const result = await handler.lambdaHandler(eventMock, contextMock);
+      await handler.lambdaHandler(eventMock, contextMock);
       expect(spy).toHaveBeenCalled();
     });
     test('Unknown event trigger throws error', async () => {
