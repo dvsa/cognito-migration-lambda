@@ -5,8 +5,6 @@
     "password": "test"
   },
   "response": {
-    "userAttributes": {},
-    "finalUserStatus": "Nope",
-    "messageAction": "Nope"
+    "userAttributes": {}
   }
 }
