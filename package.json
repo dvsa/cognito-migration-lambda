@@ -1,20 +1,24 @@
 {
-  "name": "dvsa-lambda-starter",
+  "name": "cognito-user-migration",
   "version": "1.0.0",
-  "description": "A package to act as a starter for typescript lambdas",
+  "description": "A lambda function responsible for handling user migration trigger events from AWS Cognito",
   "main": "index.js",
   "scripts": {
     "lint": "eslint '*/**/*.ts' --quiet --fix",
     "lint:ci": "eslint '*/**/*.ts'",
     "test": "jest --coverage",
     "test:ci": "jest --ci",
+    "build": "npm run build:dev",
     "build:dev": "NODE_ENV=development webpack-cli --config webpack/webpack.development.js",
     "watch:dev": "NODE_ENV=development webpack-cli --config webpack/webpack.development.watch.js",
     "build:prod": "webpack-cli --config webpack/webpack.production.js",
-    "start:dev": "sam local start-api",
     "invoke": "sam local invoke"
   },
   "contributors": [
+    {
+      "name": "James Wragg",
+      "email": "james.wragg@dvsa.gov.uk"
+    },
     {
       "name": "Shaun Hare",
       "email": "shaun.hare@dvsa.gov.uk"
@@ -22,7 +26,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.943.0"
+    "aws-lambda": "^1.0.6",
+    "ldapts": "^3.0.5"
   },
   "devDependencies": {
     "@dvsa/eslint-config-ts": "^2.0.1",
@@ -32,6 +37,7 @@
     "@types/uuid": "^8.3.1",
     "archiver": "^5.3.0",
     "aws-sam-webpack-plugin": "^0.9.0",
+    "aws-sdk": "^2.969.0",
     "current-git-branch": "^1.1.0",
     "eslint": "^7.30.0",
     "eslint-import-resolver-typescript": "^2.4.0",
@@ -43,7 +49,7 @@
     "typescript": "^3.9.10",
     "uuid": "^8.3.2",
     "webpack": "^5.44.0",
-    "webpack-cli": "^4.7.2",
+    "webpack-cli": "^4.8.0",
     "webpack-merge": "^5.8.0"
   },
   "engines": {

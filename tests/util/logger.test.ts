@@ -1,59 +1,30 @@
-import type { APIGatewayProxyEvent, Context, APIGatewayEventRequestContext } from 'aws-lambda';
+import type { Context } from 'aws-lambda';
 import { v4 } from 'uuid';
 import { createLogger, Logger } from '../../src/util/logger';
 
 describe('Test logger', () => {
-  test('createLogger() via context lambdaId should return a logger object with the correct logFormat', () => {
-    const queryStringParameters: Record<string, string> = { message: 'Hello world!' };
-    const apiRequestId: string = v4();
-    const requestContext: APIGatewayEventRequestContext = <APIGatewayEventRequestContext> { requestId: apiRequestId };
-    const headers: Record<string, string> = {};
-    const eventMock: APIGatewayProxyEvent = <APIGatewayProxyEvent> { queryStringParameters, requestContext, headers };
+  test('createLogger() via header should return a logger object with the correct logFormat', () => {
     const awsRequestId: string = v4();
     const contextMock: Context = <Context> { awsRequestId };
 
-    const logger: Logger = createLogger(eventMock, contextMock);
+    const logger: Logger = createLogger(contextMock);
 
     expect(logger.logFormat).toBe(
-      `{ "apiRequestId": "${apiRequestId}", "correlationId": "${awsRequestId}", "message": "%s" }`,
+      `{ "awsRequestId": "${awsRequestId}", "message": "%s" }`,
     );
   });
 
-  test('createLogger() via header should return a logger object with the correct logFormat', () => {
-    const queryStringParameters: Record<string, string> = { message: 'Hello world!' };
-    const apiRequestId: string = v4();
-    const requestContext: APIGatewayEventRequestContext = <APIGatewayEventRequestContext> { requestId: apiRequestId };
-    const headerCorrelationId: string = v4();
-    const headers: Record<string, string> = { 'X-Correlation-Id': headerCorrelationId };
-    const eventMock: APIGatewayProxyEvent = <APIGatewayProxyEvent> { queryStringParameters, requestContext, headers };
-    const contextMock: Context = <Context> { };
+  test('logger.trace() calls console.trace() with expected parameters', () => {
+    const logger: Logger = new Logger('');
+    console.trace = jest.fn();
 
-    const logger: Logger = createLogger(eventMock, contextMock);
+    logger.trace('hello');
 
-    expect(logger.logFormat).toBe(
-      `{ "apiRequestId": "${apiRequestId}", "correlationId": "${headerCorrelationId}", "message": "%s" }`,
-    );
+    expect(console.trace).toHaveBeenCalledWith(logger.logFormat, 'hello');
   });
-
-  test('createLogger() should set the correlationId to awsRequestId when invoked without an X-Correlation-Id header',
-    () => {
-      const queryStringParameters: Record<string, string> = {};
-      const apiRequestId: string = v4();
-      const requestContext: APIGatewayEventRequestContext = <APIGatewayEventRequestContext> { requestId: apiRequestId };
-      const headers: Record<string, string> = {}; // no headers
-      const eventMock: APIGatewayProxyEvent = <APIGatewayProxyEvent> { queryStringParameters, requestContext, headers };
-      const awsRequestId: string = v4();
-      const contextMock: Context = <Context> { awsRequestId };
-
-      const logger: Logger = createLogger(eventMock, contextMock);
-
-      expect(logger.logFormat).toBe(
-        `{ "apiRequestId": "${apiRequestId}", "correlationId": "${awsRequestId}", "message": "%s" }`,
-      );
-    });
 
   test('logger.debug() calls console.debug() with expected parameters', () => {
-    const logger: Logger = new Logger('', '');
+    const logger: Logger = new Logger('');
     console.debug = jest.fn();
 
     logger.debug('hello');
@@ -62,7 +33,7 @@ describe('Test logger', () => {
   });
 
   test('logger.info() calls console.info() with expected parameters', () => {
-    const logger: Logger = new Logger('', '');
+    const logger: Logger = new Logger('');
     console.info = jest.fn();
 
     logger.info('hello');
@@ -71,7 +42,7 @@ describe('Test logger', () => {
   });
 
   test('logger.warn() calls console.warn() with expected parameters', () => {
-    const logger: Logger = new Logger('', '');
+    const logger: Logger = new Logger('');
     console.warn = jest.fn();
 
     logger.warn('hello');
@@ -80,7 +51,7 @@ describe('Test logger', () => {
   });
 
   test('logger.error() calls console.error() with expected parameters', () => {
-    const logger: Logger = new Logger('', '');
+    const logger: Logger = new Logger('');
     console.error = jest.fn();
 
     logger.error('hello');

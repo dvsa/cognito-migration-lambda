@@ -1,0 +1,10 @@
+{
+  "triggerSource": "UserMigration_Authentication",
+  "userName": "test",
+  "request": {
+    "password": "test"
+  },
+  "response": {
+    "userAttributes": {}
+  }
+}

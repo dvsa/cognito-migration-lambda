@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  CognitoUserMigrationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/handler/cognitoUserMigrationEvent.lambdaHandler
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          LDAP_URL: ''
+          LDAP_OPERATION_TIMEOUT: ''
+          LDAP_ADMIN_DN: ''
+          LDAP_ADMIN_PASSWORD: ''
+          LDAP_USER_SEARCH_BASE: ''
+          LDAP_USERNAME_ATTRIBUTE: ''
+          LDAP_OBJECT_FILTER_MAP: ''
+
+Outputs:
+  CognitoUserMigrationFunction:
+    Description: "Cognito User Migration Lambda Function ARN"
+    Value: !GetAtt CognitoUserMigrationFunction.Arn
+  CognitoUserMigrationFunctionIamRole:
+    Description: "Implicit IAM Role created for Cognito User Migration function"
+    Value: !GetAtt CognitoUserMigrationFunctionRole.Arn
