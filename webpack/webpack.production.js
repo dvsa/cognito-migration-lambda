@@ -4,9 +4,9 @@ const common = require('./webpack.common.js');
 const archiver = require('archiver');
 const branchName = require('current-git-branch');
 
-const LAMBDA_NAME = 'GetLambdaFunction';
+const LAMBDA_NAME = 'CognitoUserMigrationFunction';
 const OUTPUT_FOLDER = './dist'
-const REPO_NAME = 'dvsa-lambda-starter';
+const REPO_NAME = 'cognito-migration-lambda';
 const BRANCH_NAME = branchName().replace(/\//g,"-");
 
 class BundlePlugin {
