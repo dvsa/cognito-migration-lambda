@@ -35,14 +35,33 @@ The FQDN for the admin user to search and obtain user objects.
 cn=admin,dc=localdev,dc=dvsa
 ```
 
-### LDAP_ADMIN_PASSWORD
+### SECRETS_MANAGER_NAME
 
-The password/credential used to authenticate the ADMIN user.
+The "Secret name" as defined in **AWS Secrets Manager**
 
 #### Example
 ```text
-password
+my-secret-stash
 ```
+
+### SECRETS_MANAGER_KEY_LDAP_ADMIN_PASSWORD
+
+The key which exists in the secret retrieved from **AWS Secrets Manager**
+
+The key should have a value which is the password/credential used to authenticate the ADMIN user.
+
+#### Example
+```text
+LDAP_ADMIN_PASSWORD
+```
+
+#### Pro Tip
+
+The value used in this environment variable can also be defined as another environment variable, if it is defined, the application will use the value in environment variable instead of asking **AWS Secrets Manager**. 
+
+This is useful for example for local development. For example (and using the example above), if we define an environment variable `LDAP_ADMIN_PASSWORD` the value in there is used instead of the value from **AWS Secrets Manager**.
+
+_This functionality is provided by https://github.com/dvsa/dvsa-secrets-manager/._ 
 
 ### LDAP_USER_SEARCH_BASE
 
