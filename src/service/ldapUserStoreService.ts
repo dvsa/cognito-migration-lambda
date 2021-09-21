@@ -1,13 +1,17 @@
 import { Client, Entry } from 'ldapts';
 import { InvalidCredentialsError, NoSuchObjectError } from 'ldapts/errors/resultCodeErrors';
+import { SecretsManager } from '@dvsa/secrets-manager';
 import { Logger } from '../util/logger';
 import { UserNotFoundException, InvalidCredentialsException, LdapException } from '../exception';
 
 export class LdapUserStoreService {
   private readonly logger: Logger;
 
+  private readonly secretsManager: SecretsManager;
+
   constructor(logger: Logger) {
     this.logger = logger;
+    this.secretsManager = new SecretsManager();
   }
 
   public async getUser(userName: string): Promise<Entry | null> {
@@ -16,8 +20,9 @@ export class LdapUserStoreService {
     const searchDn = `${process.env.LDAP_USERNAME_ATTRIBUTE}=${userName},${process.env.LDAP_USER_SEARCH_BASE}`;
 
     try {
+      const ldapAdminPassword: string = await this.getLdapAdminPassword();
       this.logger.trace(`Attempting to BIND on ${process.env.LDAP_URL} with ${process.env.LDAP_ADMIN_DN}`);
-      await client.bind(process.env.LDAP_ADMIN_DN, process.env.LDAP_ADMIN_PASSWORD);
+      await client.bind(process.env.LDAP_ADMIN_DN, ldapAdminPassword);
       this.logger.trace(`Attempting to SEARCH on ${process.env.LDAP_URL} with ${searchDn}`);
       const { searchEntries } = await client.search(searchDn);
       this.logger.trace(`Search Entries: ${JSON.stringify(searchEntries)}`);
@@ -68,5 +73,12 @@ export class LdapUserStoreService {
       url: process.env.LDAP_URL,
       timeout: Number(process.env.LDAP_OPERATION_TIMEOUT) || 5000,
     });
+  }
+
+  protected async getLdapAdminPassword(): Promise<string> {
+    return this.secretsManager.getSecretWithKey(
+      process.env.SECRETS_MANAGER_NAME,
+      process.env.SECRETS_MANAGER_KEY_LDAP_ADMIN_PASSWORD,
+    );
   }
 }

@@ -16,6 +16,7 @@ jest.mock('../../src/util/logger', () => ({
 }));
 
 jest.mock('ldapts/Client');
+jest.mock('@dvsa/secrets-manager');
 
 describe('Test ldapUserStoreService', () => {
   afterEach(() => {
