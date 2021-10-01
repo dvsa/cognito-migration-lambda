@@ -85,14 +85,43 @@ describe('Test cognitoUserMigrationEventHandler', () => {
         },
       };
 
-      process.env.LDAP_OBJECT_FILTER_MAP = JSON.stringify({});
+      process.env.LDAP_OBJECT_FILTER_MAP = JSON.stringify({
+        mail: 'email',
+        cn: 'username',
+      });
 
-      const entry: Entry = <Entry> {};
+      const entry: Entry = <Entry> {
+        dn: 'dn-test',
+        cn: 'cn-test',
+        mail: 'mail-test',
+      };
 
       const result: UserMigrationTriggerEvent = handler.generateMigrationEventResponse(entry, eventMock);
 
       expect(result.response.userAttributes).toHaveProperty('email_verified');
       expect(result.response.userAttributes.email_verified).toBe('true');
+    });
+    test('Email Verified is NOT set when no email', () => {
+      const eventMock: UserMigrationForgotPasswordTriggerEvent = <UserMigrationForgotPasswordTriggerEvent> {
+        triggerSource: 'UserMigration_ForgotPassword',
+        response: {
+          userAttributes: {},
+        },
+      };
+
+      process.env.LDAP_OBJECT_FILTER_MAP = JSON.stringify({
+        mail: 'email',
+        cn: 'username',
+      });
+
+      const entry: Entry = <Entry> {
+        dn: 'dn-test',
+        cn: 'cn-test',
+      };
+
+      const result: UserMigrationTriggerEvent = handler.generateMigrationEventResponse(entry, eventMock);
+
+      expect(result.response.userAttributes).not.toHaveProperty('email_verified');
     });
     test('FinalUserStatus is set to confirmed', () => {
       const eventMock: UserMigrationForgotPasswordTriggerEvent = <UserMigrationForgotPasswordTriggerEvent> {
