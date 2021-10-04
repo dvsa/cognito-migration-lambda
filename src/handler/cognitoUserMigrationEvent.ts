@@ -16,11 +16,8 @@ export const generateMigrationEventResponse = (
     const key: string = Object.keys(user)[Number(i)];
     if (key in map) {
       attributes[map[key.toString()]] = user[key.toString()].toString();
-      if (key === 'mail') {
-        const email = user[key.toString()];
-        if (email != null && email.length > 0) {
-          attributes.email_verified = 'true';
-        }
+      if (map[key.toString()] === 'email') {
+        attributes.email_verified = 'true';
       }
     }
   }

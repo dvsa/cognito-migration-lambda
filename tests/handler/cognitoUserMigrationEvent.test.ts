@@ -93,7 +93,7 @@ describe('Test cognitoUserMigrationEventHandler', () => {
       const entry: Entry = <Entry> {
         dn: 'dn-test',
         cn: 'cn-test',
-        mail: 'mail-test',
+        mail: 'email-test',
       };
 
       const result: UserMigrationTriggerEvent = handler.generateMigrationEventResponse(entry, eventMock);
@@ -110,13 +110,13 @@ describe('Test cognitoUserMigrationEventHandler', () => {
       };
 
       process.env.LDAP_OBJECT_FILTER_MAP = JSON.stringify({
-        mail: 'email',
         cn: 'username',
       });
 
       const entry: Entry = <Entry> {
         dn: 'dn-test',
         cn: 'cn-test',
+        mail: 'email-test',
       };
 
       const result: UserMigrationTriggerEvent = handler.generateMigrationEventResponse(entry, eventMock);
