@@ -16,9 +16,11 @@ export const generateMigrationEventResponse = (
     const key: string = Object.keys(user)[Number(i)];
     if (key in map) {
       attributes[map[key.toString()]] = user[key.toString()].toString();
+      if (map[key.toString()] === 'email') {
+        attributes.email_verified = 'true';
+      }
     }
   }
-  attributes.email_verified = 'true';
   event.response.userAttributes = attributes;
   event.response.finalUserStatus = 'CONFIRMED';
   event.response.messageAction = 'SUPPRESS';
