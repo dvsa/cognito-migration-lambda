@@ -1,4 +1,4 @@
-import { Client, Entry } from 'ldapts';
+import { Client, Entry, RDN } from 'ldapts';
 import { InvalidCredentialsError, NoSuchObjectError } from 'ldapts/errors/resultCodeErrors';
 import { SecretsManager } from '@dvsa/secrets-manager';
 import { Logger } from '../util/logger';
@@ -17,7 +17,11 @@ export class LdapUserStoreService {
   public async getUser(userName: string): Promise<Entry | null> {
     const client = this.createClient();
 
-    const searchDn = `${process.env.LDAP_USERNAME_ATTRIBUTE}=${userName},${process.env.LDAP_USER_SEARCH_BASE}`;
+    const usernameDn: RDN = new RDN({
+      [process.env.LDAP_USERNAME_ATTRIBUTE]: userName,
+    });
+
+    const searchDn = `${usernameDn.toString()},${process.env.LDAP_USER_SEARCH_BASE}`;
 
     try {
       const ldapAdminPassword: string = await this.getLdapAdminPassword();
