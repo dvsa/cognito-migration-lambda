@@ -28,7 +28,7 @@
   "dependencies": {
     "@dvsa/secrets-manager": "^1.0.1",
     "aws-lambda": "^1.0.6",
-    "ldapts": "^3.0.6"
+    "ldapts": "^3.1.1"
   },
   "devDependencies": {
     "@dvsa/eslint-config-ts": "^2.0.1",
