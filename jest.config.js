@@ -2,6 +2,7 @@ module.exports = {
   verbose: true,
   transform: {'\\.ts$': ['ts-jest']},
   transformIgnorePatterns: ['<rootDir>/node_modules/'],
+  modulePathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/.aws-sam/"],
   coverageDirectory: '<rootDir>/coverage/',
   coverageThreshold: {
     global: {
