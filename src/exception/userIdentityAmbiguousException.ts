@@ -1,8 +1,10 @@
-import { Filter } from "ldapts/filters/Filter";
+import { Filter } from 'ldapts/filters/Filter';
 
 export class UserIdentityAmbiguousException extends Error {
   private username: string;
+
   private filter: Filter;
+
   private searchDn: string;
 
   constructor(userName: string, searchDn?: string, filter?: Filter, message?: string) {

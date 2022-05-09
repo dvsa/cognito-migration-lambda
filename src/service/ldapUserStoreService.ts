@@ -1,4 +1,4 @@
-import {Client, Entry, EqualityFilter, EqualityFilterOptions, FilterParser, RDN} from 'ldapts';
+import { Client, Entry, EqualityFilter, EqualityFilterOptions, FilterParser, RDN } from 'ldapts';
 import { InvalidCredentialsError, NoSuchObjectError } from 'ldapts/errors/resultCodeErrors';
 import { SecretsManager } from '@dvsa/secrets-manager';
 import { Logger } from '../util/logger';
@@ -6,9 +6,9 @@ import {
   UserNotFoundException,
   InvalidCredentialsException,
   LdapException,
-  UserIdentityAmbiguousException
+  UserIdentityAmbiguousException,
 } from '../exception';
-import {Filter} from "ldapts/filters/Filter";
+import { Filter } from 'ldapts/filters/Filter';
 
 export class LdapUserStoreService {
   private readonly logger: Logger;
@@ -25,6 +25,7 @@ export class LdapUserStoreService {
 
     const filter: Filter = new EqualityFilter(new class implements EqualityFilterOptions {
       attribute: string = process.env.LDAP_USERNAME_ATTRIBUTE;
+
       value: string = userName;
     });
 
@@ -32,7 +33,12 @@ export class LdapUserStoreService {
       const ldapAdminPassword: string = await this.getLdapAdminPassword();
       this.logger.trace(`Attempting to BIND on ${process.env.LDAP_URL} with ${process.env.LDAP_ADMIN_DN}`);
       await client.bind(process.env.LDAP_ADMIN_DN, ldapAdminPassword);
-      this.logger.trace(`Attempting to SEARCH on ${process.env.LDAP_URL} for user '${userName}' using FILTER ${JSON.stringify(filter)} with base DN ${process.env.LDAP_USER_SEARCH_BASE}`);
+      this.logger.trace(
+        `Attempting to SEARCH on ${process.env.LDAP_URL}` +
+        ` for user '${userName}'` +
+        ` using FILTER ${JSON.stringify(filter)}` +
+        ` with base DN ${process.env.LDAP_USER_SEARCH_BASE}`,
+      );
       const { searchEntries, searchReferences } = await client.search(process.env.LDAP_USER_SEARCH_BASE, {
         filter: filter,
       });
@@ -46,7 +52,12 @@ export class LdapUserStoreService {
           this.logger.trace(`Using Entry: ${entry.dn}`);
           return entry;
         default:
-          throw new UserIdentityAmbiguousException(userName, process.env.LDAP_USER_SEARCH_BASE, filter, 'Identity is ambiguous');
+          throw new UserIdentityAmbiguousException(
+            userName,
+            process.env.LDAP_USER_SEARCH_BASE,
+            filter,
+            'Identity is ambiguous',
+          );
       }
     } catch (e) {
       if (e instanceof UserNotFoundException || e instanceof UserIdentityAmbiguousException) {
@@ -74,7 +85,11 @@ export class LdapUserStoreService {
       await client.bind(user.dn, password);
       return user;
     } catch (e) {
-      if (e instanceof UserNotFoundException || e instanceof UserIdentityAmbiguousException || e instanceof LdapException) {
+      if (
+        e instanceof UserNotFoundException ||
+        e instanceof UserIdentityAmbiguousException ||
+        e instanceof LdapException
+      ) {
         throw e;
       }
       if (e instanceof InvalidCredentialsError) {

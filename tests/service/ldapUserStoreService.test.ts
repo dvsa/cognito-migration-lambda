@@ -7,7 +7,7 @@ import {
   InvalidCredentialsException,
   LdapException,
   UserIdentityAmbiguousException,
-  UserNotFoundException
+  UserNotFoundException,
 } from '../../src/exception';
 
 jest.mock('../../src/util/logger', () => ({
@@ -47,7 +47,7 @@ describe('Test ldapUserStoreService', () => {
 
       expect(await sut.getUser('test')).toBe(entry);
     });
-    test('Searching for a username that exists and returns multiple results throws UserIdentityAmbiguousException', async () => {
+    test('Searching for a username multiple results throws UserIdentityAmbiguousException', async () => {
       const logger: Logger = new Logger('');
       const sut = new LdapUserStoreService(logger);
 
