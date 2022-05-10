@@ -1,5 +1,5 @@
-import { Client, Entry, EqualityFilter, EqualityFilterOptions, FilterParser, RDN } from 'ldapts';
-import { InvalidCredentialsError, NoSuchObjectError } from 'ldapts/errors/resultCodeErrors';
+import { Client, Entry, EqualityFilter } from 'ldapts';
+import { InvalidCredentialsError } from 'ldapts/errors/resultCodeErrors';
 import { SecretsManager } from '@dvsa/secrets-manager';
 import { Logger } from '../util/logger';
 import {
@@ -38,7 +38,7 @@ export class LdapUserStoreService {
         ` using FILTER ${JSON.stringify(filter)}` +
         ` with base DN ${process.env.LDAP_USER_SEARCH_BASE}`,
       );
-      const { searchEntries, searchReferences } = await client.search(process.env.LDAP_USER_SEARCH_BASE, {
+      const { searchEntries } = await client.search(process.env.LDAP_USER_SEARCH_BASE, {
         filter: filter,
       });
 

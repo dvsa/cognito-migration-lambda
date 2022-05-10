@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { Client, Entry } from 'ldapts';
-import { InvalidCredentialsError, NoSuchObjectError } from 'ldapts/errors/resultCodeErrors';
+import { InvalidCredentialsError } from 'ldapts/errors/resultCodeErrors';
 import { LdapUserStoreService } from '../../src/service/ldapUserStoreService';
 import { Logger } from '../../src/util/logger';
 import {
