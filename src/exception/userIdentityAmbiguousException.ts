@@ -9,12 +9,13 @@ export class UserIdentityAmbiguousException extends Error {
 
   constructor(userName: string, searchDn?: string, filter?: Filter, message?: string) {
     super(message);
-    this.name = 'UserNotFoundException';
+    this.name = this.constructor.name;
     this.username = userName;
     this.searchDn = searchDn;
     this.filter = filter;
 
-    // Set the prototype explicitly.
-    Object.setPrototypeOf(this, UserIdentityAmbiguousException.prototype);
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, UserIdentityAmbiguousException);
+    }
   }
 }

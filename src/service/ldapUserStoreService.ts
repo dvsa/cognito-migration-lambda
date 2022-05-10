@@ -23,10 +23,9 @@ export class LdapUserStoreService {
   public async getUser(userName: string): Promise<Entry | null> {
     const client = this.createClient();
 
-    const filter: Filter = new EqualityFilter(new class implements EqualityFilterOptions {
-      attribute: string = process.env.LDAP_USERNAME_ATTRIBUTE;
-
-      value: string = userName;
+    const filter: Filter = new EqualityFilter({
+      attribute: process.env.LDAP_USERNAME_ATTRIBUTE,
+      value: userName,
     });
 
     try {

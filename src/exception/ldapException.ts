@@ -1,9 +1,10 @@
 export class LdapException extends Error {
   constructor(message?: string) {
     super(message);
-    this.name = 'LdapException';
+    this.name = this.constructor.name;
 
-    // Set the prototype explicitly.
-    Object.setPrototypeOf(this, LdapException.prototype);
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, LdapException);
+    }
   }
 }
