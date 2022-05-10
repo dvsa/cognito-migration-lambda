@@ -1,9 +1,14 @@
 // eslint-disable-next-line max-classes-per-file
 import { Client, Entry } from 'ldapts';
-import { InvalidCredentialsError, NoSuchObjectError } from 'ldapts/errors/resultCodeErrors';
+import { InvalidCredentialsError } from 'ldapts/errors/resultCodeErrors';
 import { LdapUserStoreService } from '../../src/service/ldapUserStoreService';
 import { Logger } from '../../src/util/logger';
-import { InvalidCredentialsException, LdapException, UserNotFoundException } from '../../src/exception';
+import {
+  InvalidCredentialsException,
+  LdapException,
+  UserIdentityAmbiguousException,
+  UserNotFoundException,
+} from '../../src/exception';
 
 jest.mock('../../src/util/logger', () => ({
   Logger: jest.fn().mockImplementation(() => ({
@@ -36,22 +41,40 @@ describe('Test ldapUserStoreService', () => {
 
       Client.prototype.search = jest.fn().mockImplementation(
         () => ({
-          searchEntries: {
-            pop: () => entry,
-          },
+          searchEntries: [entry],
         }),
       );
 
       expect(await sut.getUser('test')).toBe(entry);
+    });
+    test('Searching for a username multiple results throws UserIdentityAmbiguousException', async () => {
+      const logger: Logger = new Logger('');
+      const sut = new LdapUserStoreService(logger);
+
+      const entry: Entry = new class implements Entry {
+        [index: string]: Buffer | Buffer[] | string[] | string;
+
+        dn: string;
+      }();
+
+      Client.prototype.search = jest.fn().mockImplementation(
+        () => ({
+          searchEntries: [entry, entry],
+        }),
+      );
+
+      await expect(async () => {
+        await sut.getUser('test');
+      }).rejects.toThrow(UserIdentityAmbiguousException);
     });
     test('Searching for a username that DOES NOT exist throws UserNotFoundException', async () => {
       const logger: Logger = new Logger('');
       const sut = new LdapUserStoreService(logger);
 
       Client.prototype.search = jest.fn().mockImplementation(
-        () => {
-          throw new NoSuchObjectError();
-        },
+        () => ({
+          searchEntries: [],
+        }),
       );
 
       await expect(async () => {

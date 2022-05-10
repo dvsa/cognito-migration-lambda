@@ -13,6 +13,7 @@ Resources:
           LDAP_URL: ''
           LDAP_OPERATION_TIMEOUT: ''
           LDAP_ADMIN_DN: ''
+          SECRETS_MANAGER_KEY_LDAP_ADMIN_PASSWORD: ''
           LDAP_ADMIN_PASSWORD: ''
           LDAP_USER_SEARCH_BASE: ''
           LDAP_USERNAME_ATTRIBUTE: ''

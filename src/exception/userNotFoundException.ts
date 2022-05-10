@@ -5,11 +5,12 @@ export class UserNotFoundException extends Error {
 
   constructor(userName: string, searchDn?: string, message?: string) {
     super(message);
-    this.name = 'UserNotFoundException';
+    this.name = this.constructor.name;
     this.username = userName;
     this.searchDn = searchDn;
 
-    // Set the prototype explicitly.
-    Object.setPrototypeOf(this, UserNotFoundException.prototype);
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, UserNotFoundException);
+    }
   }
 }

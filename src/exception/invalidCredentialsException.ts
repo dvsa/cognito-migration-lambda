@@ -5,11 +5,12 @@ export class InvalidCredentialsException extends Error {
 
   constructor(userName: string, bindDn?: string, message?: string) {
     super(message);
-    this.name = 'InvalidCredentialsException';
+    this.name = this.constructor.name;
     this.username = userName;
     this.bindDn = bindDn;
 
-    // Set the prototype explicitly.
-    Object.setPrototypeOf(this, InvalidCredentialsException.prototype);
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, InvalidCredentialsException);
+    }
   }
 }

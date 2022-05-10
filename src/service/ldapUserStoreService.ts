@@ -1,8 +1,14 @@
-import { Client, Entry, RDN } from 'ldapts';
-import { InvalidCredentialsError, NoSuchObjectError } from 'ldapts/errors/resultCodeErrors';
+import { Client, Entry, EqualityFilter } from 'ldapts';
+import { InvalidCredentialsError } from 'ldapts/errors/resultCodeErrors';
 import { SecretsManager } from '@dvsa/secrets-manager';
 import { Logger } from '../util/logger';
-import { UserNotFoundException, InvalidCredentialsException, LdapException } from '../exception';
+import {
+  UserNotFoundException,
+  InvalidCredentialsException,
+  LdapException,
+  UserIdentityAmbiguousException,
+} from '../exception';
+import { Filter } from 'ldapts/filters/Filter';
 
 export class LdapUserStoreService {
   private readonly logger: Logger;
@@ -17,58 +23,85 @@ export class LdapUserStoreService {
   public async getUser(userName: string): Promise<Entry | null> {
     const client = this.createClient();
 
-    const usernameDn: RDN = new RDN({
-      [process.env.LDAP_USERNAME_ATTRIBUTE]: userName,
+    const filter: Filter = new EqualityFilter({
+      attribute: process.env.LDAP_USERNAME_ATTRIBUTE,
+      value: userName,
     });
-
-    const searchDn = `${usernameDn.toString()},${process.env.LDAP_USER_SEARCH_BASE}`;
 
     try {
       const ldapAdminPassword: string = await this.getLdapAdminPassword();
       this.logger.trace(`Attempting to BIND on ${process.env.LDAP_URL} with ${process.env.LDAP_ADMIN_DN}`);
       await client.bind(process.env.LDAP_ADMIN_DN, ldapAdminPassword);
-      this.logger.trace(`Attempting to SEARCH on ${process.env.LDAP_URL} with ${searchDn}`);
-      const { searchEntries } = await client.search(searchDn);
-      this.logger.trace(`Search Entries: ${JSON.stringify(searchEntries)}`);
-      const entry: Entry = searchEntries.pop();
-      this.logger.trace(`Using Entry: ${JSON.stringify(entry)}`);
-      return entry;
+      this.logger.trace(
+        `Attempting to SEARCH on ${process.env.LDAP_URL}` +
+        ` for user '${userName}'` +
+        ` using FILTER ${JSON.stringify(filter)}` +
+        ` with base DN ${process.env.LDAP_USER_SEARCH_BASE}`,
+      );
+      const { searchEntries } = await client.search(process.env.LDAP_USER_SEARCH_BASE, {
+        filter: filter,
+      });
+
+      this.logger.trace(`Search Entries: ${JSON.stringify(searchEntries.map(entry => entry.dn))}`);
+      switch (searchEntries.length) {
+        case 0:
+          throw new UserNotFoundException(userName, process.env.LDAP_USER_SEARCH_BASE, 'Unable to find user');
+        case 1:
+          const entry: Entry = searchEntries.pop();
+          this.logger.trace(`Using Entry: ${entry.dn}`);
+          return entry;
+        default:
+          throw new UserIdentityAmbiguousException(
+            userName,
+            process.env.LDAP_USER_SEARCH_BASE,
+            filter,
+            'Identity is ambiguous',
+          );
+      }
     } catch (e) {
-      if (e instanceof NoSuchObjectError) {
-        throw new UserNotFoundException(userName, searchDn, e.message);
+      if (e instanceof UserNotFoundException || e instanceof UserIdentityAmbiguousException) {
+        throw e;
       }
       const error: Error = e as Error;
-      this.logger.error(JSON.stringify(error));
+      this.logger.error(error.message);
       throw new LdapException(error.message);
     } finally {
-      this.logger.trace(`Attempting to UNBIND on ${process.env.LDAP_URL} with ${process.env.LDAP_ADMIN_DN}`);
-      await client.unbind();
+      if (client.isConnected) {
+        this.logger.trace(`Attempting to UNBIND on ${process.env.LDAP_URL} with ${process.env.LDAP_ADMIN_DN}`);
+        await client.unbind();
+      }
     }
   }
 
   public async authenticate(userName: string, password: string): Promise<Entry> {
     const client = this.createClient();
-
-    const bindDn = `${process.env.LDAP_USERNAME_ATTRIBUTE}=${userName},${process.env.LDAP_USER_SEARCH_BASE}`;
+    let user: Entry;
 
     try {
-      const user: Entry = await this.getUser(userName);
-      this.logger.trace(`Attempting to BIND on ${process.env.LDAP_URL} with ${bindDn}`);
-      await client.bind(bindDn, password);
+      user = await this.getUser(userName);
+      this.logger.trace(`Using ${user.dn} for authentication`);
+      this.logger.trace(`Attempting to BIND on ${process.env.LDAP_URL} with ${user.dn} using supplied password`);
+      await client.bind(user.dn, password);
       return user;
     } catch (e) {
-      if (e instanceof UserNotFoundException || e instanceof LdapException) {
+      if (
+        e instanceof UserNotFoundException ||
+        e instanceof UserIdentityAmbiguousException ||
+        e instanceof LdapException
+      ) {
         throw e;
       }
       if (e instanceof InvalidCredentialsError) {
-        throw new InvalidCredentialsException(userName, bindDn, e.message);
+        throw new InvalidCredentialsException(userName, user.dn, e.message);
       }
       const error: Error = e as Error;
       this.logger.error(JSON.stringify(error));
       throw new LdapException(error.message);
     } finally {
-      this.logger.trace(`Attempting to UNBIND on ${process.env.LDAP_URL} with ${bindDn}`);
-      await client.unbind();
+      if (client.isConnected) {
+        this.logger.trace(`Attempting to UNBIND on ${process.env.LDAP_URL} with ${user.dn}`);
+        await client.unbind();
+      }
     }
   }
 
