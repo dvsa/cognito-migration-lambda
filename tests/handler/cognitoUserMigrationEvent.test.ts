@@ -160,24 +160,5 @@ describe('Test cognitoUserMigrationEventHandler', () => {
       expect(result.response).toHaveProperty('messageAction');
       expect(result.response.messageAction).toBe('SUPPRESS');
     });
-    test('Username defaults to requested username if not mapped in env', () => {
-      const eventMock: UserMigrationAuthenticationTriggerEvent = <UserMigrationAuthenticationTriggerEvent> {
-        triggerSource: 'UserMigration_Authentication',
-        userName: 'cAse0001',
-        response: {
-          userAttributes: {},
-        },
-      };
-
-      const entry: Entry = <Entry> {
-        dn: 'dn-test',
-        cn: 'CASE0001',
-      };
-
-      const result: UserMigrationTriggerEvent = handler.generateMigrationEventResponse(entry, eventMock);
-
-      expect(result.response.userAttributes).toHaveProperty('username');
-      expect(result.response.userAttributes.username).toEqual(eventMock.userName);
-    });
   });
 });

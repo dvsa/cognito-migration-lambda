@@ -13,8 +13,6 @@ export const generateMigrationEventResponse = (
   const map: Record<string, string> = JSON.parse(process.env.LDAP_OBJECT_FILTER_MAP) as Record<string, string>;
   const attributes: Record<string, string> = {};
 
-  attributes.username = event.userName;
-
   for (let i = 0; i < Object.keys(user).length; i++) {
     const key: string = Object.keys(user)[Number(i)];
     if (key in map) {
