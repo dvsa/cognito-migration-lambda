@@ -99,7 +99,7 @@ Attributes not defined are ignored and not given to Cognito.
 
 ## Requirements
 
-- node v14.17.3
+- node v18.*
 - [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 
 
