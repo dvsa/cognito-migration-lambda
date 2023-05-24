@@ -10,8 +10,6 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-      - name: Bump NPM to v9
-        run: npm i -g npm@9
       - name: Install dependencies
         run: npm ci
       - name: Run lint
