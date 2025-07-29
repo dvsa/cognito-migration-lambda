@@ -55,5 +55,8 @@
   },
   "engines": {
     "node": "^18.16.0"
+  },
+  "overrides": {
+    "form-data": "4.0.4"
   }
 }
